@@ -1,0 +1,16 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug (Launch)",
+            "request": "launch",
+            "classPaths": ["/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/arkref.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/commons-lang-2.4.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/commons-logging.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/junit-3.8.2.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/jwnl.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/stanford-parser-2008-10-26.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/supersense-tagger.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/weka-3-6.jar"],
+            "sourcePaths": ["/home/adnanhd/Projects/Enocta/QuestionGeneration/src/edu/cmu/ark/ranking/", "/home/adnanhd/Projects/Enocta/QuestionGeneration/src/edu/cmu/ark/tests/", "/home/adnanhd/Projects/Enocta/QuestionGeneration/src/edu/cmu/ark/"],
+            "mainClass": "RankingEval.java"
+        }
+    ]
+}
