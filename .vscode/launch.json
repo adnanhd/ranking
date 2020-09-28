@@ -6,11 +6,13 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Debug (Launch)",
+            "name": "Debug Ranking Eval",
             "request": "launch",
-            "classPaths": ["/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/arkref.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/commons-lang-2.4.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/commons-logging.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/junit-3.8.2.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/jwnl.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/stanford-parser-2008-10-26.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/supersense-tagger.jar","/home/adnanhd/Projects/Enocta/QuestionGeneration/lib/weka-3-6.jar"],
-            "sourcePaths": ["/home/adnanhd/Projects/Enocta/QuestionGeneration/src/edu/cmu/ark/ranking/", "/home/adnanhd/Projects/Enocta/QuestionGeneration/src/edu/cmu/ark/tests/", "/home/adnanhd/Projects/Enocta/QuestionGeneration/src/edu/cmu/ark/"],
-            "mainClass": "RankingEval.java"
+            "classPaths": ["${workspaceFolder}/lib/arkref.jar","${workspaceFolder}/lib/commons-lang-2.4.jar","${workspaceFolder}/lib/commons-logging.jar","${workspaceFolder}/lib/junit-3.8.2.jar","${workspaceFolder}/lib/jwnl.jar","${workspaceFolder}/lib/stanford-parser-2008-10-26.jar","${workspaceFolder}/lib/supersense-tagger.jar","${workspaceFolder}/lib/weka-3-6.jar"],
+            "sourcePaths": ["${workspaceFolder}/src/edu/cmu/ark/ranking/", "${workspaceFolder}/src/edu/cmu/ark/tests/", "${workspaceFolder}/src/edu/cmu/ark/"],
+            "mainClass": "edu.cmu.ark.ranking.RankingEval",
+            "modulePaths": ["bin"],
+            "cwd": "${workspaceFolder}/bin"
         }
     ]
 }
