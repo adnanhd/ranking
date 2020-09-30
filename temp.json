@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - QuestionRanker",
+            "request": "launch",
+            "mainClass": "edu.cmu.ark.QuestionRanker",
+            "projectName": "temp_java_project_2c53479b"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - QuestionAsker",
+            "request": "launch",
+            "mainClass": "edu.cmu.ark.QuestionAsker",
+            "args": ["-Xmx1200m","--verbose","--model","${workspaceFolder}models/linear-regression-ranker-reg500.ser.gz","--prefer-wh","--max-length 30","--downweight-pro","<","tests/articleEnocta.txt",">","tests/articleEnocta.questions"],
+            "projectName": "temp_java_project_2c53479b"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "args": ["-Xmx1200m","--verbose","--model","${workspaceFolder}models/linear-regression-ranker-reg500.ser.gz","--prefer-wh","--max-length 30","--downweight-pro","<","tests/articleEnocta.txt",">","tests/articleEnocta.questions"],
+            
+            "mainClass": "${file}"
+        }
+    ]
+}
