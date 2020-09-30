@@ -70,7 +70,7 @@ public class QuestionAsker {
 		InitialTransformationStep trans = new InitialTransformationStep();
 		QuestionRanker qr = null;
 		
-		
+		System.out.println((args));
 		qt.setAvoidPronounsAndDemonstratives(false);
 		
 		//pre-load

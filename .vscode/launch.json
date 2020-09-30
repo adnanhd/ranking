@@ -6,13 +6,27 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Debug Ranking Eval",
+            "name": "CodeLens (Launch) - QuestionRanker",
             "request": "launch",
-            "classPaths": ["${workspaceFolder}/lib/arkref.jar","${workspaceFolder}/lib/commons-lang-2.4.jar","${workspaceFolder}/lib/commons-logging.jar","${workspaceFolder}/lib/junit-3.8.2.jar","${workspaceFolder}/lib/jwnl.jar","${workspaceFolder}/lib/stanford-parser-2008-10-26.jar","${workspaceFolder}/lib/supersense-tagger.jar","${workspaceFolder}/lib/weka-3-6.jar"],
-            "sourcePaths": ["${workspaceFolder}/src/edu/cmu/ark/ranking/", "${workspaceFolder}/src/edu/cmu/ark/tests/", "${workspaceFolder}/src/edu/cmu/ark/"],
-            "mainClass": "edu.cmu.ark.ranking.RankingEval",
-            "modulePaths": ["bin"],
-            "cwd": "${workspaceFolder}/bin"
+            "mainClass": "edu.cmu.ark.QuestionRanker",
+            
+            "projectName": "temp_java_project_2c53479b"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - QuestionAsker",
+            "request": "launch",
+            "mainClass": "edu.cmu.ark.QuestionAsker",
+            "args": ["-Xmx1200m","--verbose","--model","${workspaceFolder}models/linear-regression-ranker-reg500.ser.gz","--prefer-wh","--max-length 30","--downweight-pro","<","tests/articleEnocta.txt",">","tests/articleEnocta.questions"],
+            "projectName": "temp_java_project_2c53479b"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "args": ["-Xmx1200m","--verbose","--model","${workspaceFolder}models/linear-regression-ranker-reg500.ser.gz","--prefer-wh","--max-length 30","--downweight-pro","<","tests/articleEnocta.txt",">","tests/articleEnocta.questions"],
+            
+            "mainClass": "${file}"
         }
     ]
 }
