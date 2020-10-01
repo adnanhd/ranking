@@ -6,23 +6,48 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - QuestionAsker",
+            "request": "launch",
+            "mainClass": "edu.cmu.ark.QuestionAsker",
+            "args": [
+                "-Xmx1200m",
+                "--verbose",
+                "--model",
+                "${workspaceFolder}/models/linear-regression-ranker-reg500.ser.gz",
+                "--prefer-wh",
+                "--max-length 30",
+                "--downweight-pro",
+                "<",
+                "tests/articleEnocta.txt",
+                ">",
+                "tests/articleEnocta.questions"
+            ],
+            "projectName": "Ranking_68d95c2a"
+        },
+        {
+            "type": "java",
             "name": "Debug (Launch) - Current File",
             "request": "launch",
-            "mainClass": "${file}"
+            "mainClass": "${file}",
+            "args": [
+                "-Xmx1200m",
+                "--verbose",
+                "--model",
+                "${workspaceFolder}/models/linear-regression-ranker-reg500.ser.gz",
+                "--prefer-wh",
+                "--max-length 30",
+                "--downweight-pro",
+                "<",
+                "tests/articleEnocta.txt",
+                ">",
+                "tests/articleEnocta.questions"
+            ],
         },
         {
             "type": "java",
             "name": "Debug (Launch)-App<Ranking_99681da2>",
             "request": "launch",
             "mainClass": "App",
-            "projectName": "Ranking_99681da2"
-        },
-        {
-            "type": "java",
-            "name": "CodeLens (Launch) - QuestionAsker",
-            "request": "launch",
-            "mainClass": "edu.cmu.ark.QuestionAsker",
-            "args": ["-Xmx1200m","--verbose","--model","${workspaceFolder}models/linear-regression-ranker-reg500.ser.gz","--prefer-wh","--max-length 30","--downweight-pro","<","tests/articleEnocta.txt",">","tests/articleEnocta.questions"],
             "projectName": "Ranking_99681da2"
         }
     ]
