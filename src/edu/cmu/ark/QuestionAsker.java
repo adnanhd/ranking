@@ -164,7 +164,7 @@ public class QuestionAsker {
 				if(doc.length() == 0){
 					break;
 				}
-				GlobalProperties.setDebug(true);
+				
 				long startTime = System.currentTimeMillis();
 				List<String> sentences = AnalysisUtilities.getSentences(doc);
 				
