@@ -1,11 +1,8 @@
-import nltk
-import random
+import nltk, random, sklearn
 from nltk.corpus import movie_reviews, subjectivity
-from nltk.sentiment import SentimentAnalyzer
-from nltk.classify import NaiveBayesClassifier
+from nltk.classify import NaiveBayesClassifier, svm
 from new_FeatureExtractor import Sentence
 from nltk.sentiment.util import mark_negation, extract_unigram_feats
-
 
 class RankingEvaluator:
     # [({'source':"", 'question':"", 'answer':""}, <LABEL>)]
@@ -25,7 +22,8 @@ class RankingEvaluator:
         self.model = [(Sentence(sample), label) for (sample, label) in corpus]
         self.tests = [(sntc.get_all_words(), label)
                       for (sntc, label) in self.model]
-        self.sentim_analyzer = SentimentAnalyzer()
+
+        self.sentim_analyzer = nltk.sentiment.SentimentAnalyzer()
         self.words = []
 
         for (sentence, label) in self.model:
@@ -52,6 +50,9 @@ class RankingEvaluator:
         self.trainer = NaiveBayesClassifier.train
         self.classifier = self.sentim_analyzer.train(
             self.trainer, training_set)
+
+    def fit_svm(self, corpus):
+        return 1
 
     def predict(self, instance):
         instance = Sentence(instance)
