@@ -3,7 +3,7 @@ import random
 import sklearn
 from nltk.corpus import movie_reviews, subjectivity
 from nltk.classify import NaiveBayesClassifier, svm
-from new_FeatureExtractor import Sentence
+from FeatureExtractor import Sentence
 from nltk.sentiment.util import mark_negation, extract_unigram_feats
 from sklearn.svm import LinearSVC
 
