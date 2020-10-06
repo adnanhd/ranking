@@ -1,123 +1,58 @@
 import nltk
 import random
+import sklearn
 from nltk.corpus import movie_reviews, subjectivity
-from nltk.sentiment import SentimentAnalyzer
-from nltk.classify import NaiveBayesClassifier
-from FeatureExtractor import Sentence
+from nltk.classify import NaiveBayesClassifier, svm
+from new_FeatureExtractor import Sentence
 from nltk.sentiment.util import mark_negation, extract_unigram_feats
-
-sentim_analyzer = SentimentAnalyzer()
-all_words_neg = sentim_analyzer.all_words(
-    [mark_negation(doc) for doc in training_docs])
-
-unigram_feats = sentim_analyzer.unigram_word_feats(
-    all_words_neg, min_freq=4)
-sentim_analyzer.add_feat_extractor(
-    extract_unigram_feats, unigrams=unigram_feats)
-
-training_set = sentim_analyzer.apply_features(training_docs)
-test_set = sentim_analyzer.apply_features(testing_docs)
-
-trainer = NaiveBayesClassifier.train
-classifier = sentim_analyzer.train(trainer, training_set)
+from sklearn.svm import LinearSVC
 
 
-class RankingModel:
-    # [({'source':"", 'question':"", 'answer':""}, 'label')]
+class RankingEvaluator:
+    # [({'source':"", 'question':"", 'answer':""}, <LABEL>)]
     def __init__(self):
-        self.model = {} # {Sentence():'label'}
+        self.model = []
+        self.tests = []
         self.words = []
-        self.sentim = SentimentAnalyzer()
-        self.classify = NaiveBayesClassifier()
+        self.freq_words = None
+        self.word_features = []
+        self.featuresets = []
 
+    def fit(self, corpus):
+        # corpus: [{'question':'str','answer':'str','source':'str'}, 'label']
 
-    '''
-     @param train = [({'source':"", 'question':"", 'answer':""}, bool)]
-    '''
-    def fit(self, train):
-        self.corpus = train
+        self.classifier = nltk.classify.SklearnClassifier(LinearSVC())
+        self.dataset = [(Sentence(data).extract_morphological_features(),label) for (data,label) in corpus]
+        self.classifier.train(self.dataset)
 
-        for document in documents:
-            self.model[Sentence(document[0])] = document[1]
+    def predict(self, instance):
+        instance = Sentence(instance)
+        print(self.classifier.classify(instance.extract_morphological_features()))
 
-        for sentence in self.sentences:
-            self.words.extend(sentence.get_words())
-
-    def predict(self, test): # {'source':"", 'question':"", 'answer':""}
-        sent = Sentence(test)
-        return sent.get_feature_vector(self.words)
-
-        for word in list(self.get_freq_dist().keys())[:3000]:
-            test_features[word] = (w in self.words)  # will return either True or False
-
-        return features
-
-    def get_freq_dist(self):
-        return nltk.FreqDist(self.words)
-
-def find_features(document):
-    words = set(document)
-    features = {}
-    for w in word_features:
-        features[w] = (w in words)  # will return either True or False
-
-    return features
-
-
-featuresets = [(find_features(rev), category) for (rev, category) in documents]
-
-
-documents = [(list(movie_reviews.words(fileid)), category)
-             for category in movie_reviews.categories()
-             for fileid in movie_reviews.fileids(category)]
-
-random.shuffle(documents)
-
-all_words = []
-for w in movie_reviews.words():
-    all_words.append(w.lower())
-
-all_words = nltk.FreqDist(all_words)
-word_features = list(all_words.keys())[:3000]
-# word_features[0:10]
-
-
-
-
+    def test(self, tests):
+        testset = [(Sentence(test_data).extract_morphological_features(),label) for (test_data,label) in tests]
+        predict = [self.classifier.classify(sentence) == label for (sentence,label) in testset]
+        print("Accuracy: {0}".format(sum(predict)/len(predict)))
 
 
 if __name__ == '__main__':
-    inputs = {'question': "Who are interns in enocta?",
-              'source': "Adnan and Asrin are interns in Enocta Technologies in Ankara",
-              'answer': "Adnan and Asrin"}
+    positive_samples = open('tests/positive_samples.txt')
+    negative_samples = open('tests/negative_samples.txt')
 
-    q = Sentence(inputs)
+    corpus = []
+    corpus.extend([(eval(line), True)
+                   for line in positive_samples.readlines()])
+    corpus.extend([(eval(line), False)
+                   # line {'question':'str','answer':'str','source':'str'}
+                   for line in negative_samples.readlines()])
 
-    n_instances = 100
-
-    subj_docs = [(sent, 'subj')
-                 for sent in subjectivity.sents(categories='subj')[:n_instances]]
-    obj_docs = [(sent, 'obj')
-                for sent in subjectivity.sents(categories='obj')[:n_instances]]
-
-    train_subj_docs = subj_docs[:80]
-    test_subj_docs = subj_docs[80:100]
-    train_obj_docs = obj_docs[:80]
-    test_obj_docs = obj_docs[80:100]
-    training_docs = train_subj_docs+train_obj_docs
-    testing_docs = test_subj_docs+test_obj_docs
-
-    sentim_analyzer = SentimentAnalyzer()
-    all_words_neg = sentim_analyzer.all_words(
-        [mark_negation(doc) for doc in training_docs])
-
-    unigram_feats = sentim_analyzer.unigram_word_feats(
-        all_words_neg, min_freq=4)
-    sentim_analyzer.add_feat_extractor(
-        extract_unigram_feats, unigrams=unigram_feats)
-
-    training_set = sentim_analyzer.apply_features(training_docs)
-    test_set = sentim_analyzer.apply_features(testing_docs)
-
-    trainer = NaiveBayesClassifier.train
-    classifier = sentim_analyzer.train(trainer, training_set)
+    random.shuffle(corpus)
+    train_set = corpus[:int(len(corpus)*.7)]
+    tests_set = corpus[int(len(corpus)*.7):]
+    
+    positive_samples.close()
+    negative_samples.close()
+    
+    re = RankingEvaluator()
+    re.fit(train_set)
+    re.test(tests_set)

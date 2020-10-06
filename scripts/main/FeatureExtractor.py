@@ -1,106 +1,105 @@
-import nltk, random, re
-from nltk import pos_tag
-from nltk import ne_chunk
-from nltk.stem import PorterStemmer
-from nltk.tokenize import word_tokenize
-from nltk.corpus import movie_reviews, subjectivity
-from nltk.sentiment.util import mark_negation, extract_unigram_feats
+import nltk
+import string
+import math
+
+tokenizer = nltk.RegexpTokenizer(r"\w+")  # removes punctuation from tokens
+porter = nltk.stem.PorterStemmer()
+lemmatizer = nltk.stem.WordNetLemmatizer()
+
 
 class Featurable:
-    def __init__(self, featurable=''):
+    def __init__(self, featurable='', stopwords=()):
+        self.string = featurable
+        self.tokens = [token.lower() for token in tokenizer.tokenize(featurable) if len(token) > 0 and
+                       token not in string.punctuation and token.lower() not in stopwords]
+        self.ps_tag = nltk.pos_tag(self.tokens)
+        self.nchunk = nltk.ne_chunk(self.ps_tag)
         self.features = {}
-        self.tokens = word_tokenize(featurable.lower())
-        self.pos_tags = pos_tag(self.tokens)
-        self.ne_chunk = ne_chunk(self.pos_tags)
-        self.score = 0
 
-        self.set_feature_value('__length__', len(featurable))
-        self.set_feature_value('__wordct__', len(self.tokens))
-        self.set_feature_value('__pos__', 0)
-        self.set_feature_value('__neu__', 0)
-        self.set_feature_value('__neg__', 0)
+    def get_char_count(self):
+        return len(self.string)
 
-        porter = PorterStemmer()
-        for ((token, pos), ner) in self.ne_chunk.pos():
-            self.inc_feature_value(pos)
-            self.inc_feature_value(porter.stem(token))
-            if ner != "S":
-                self.inc_feature_value(ner)
+    def get_word_count(self):
+        return len(self.tokens)
 
-    def is_feature_exists(self, key):
-        try:
-            self.features[key]
-            return True
-        except KeyError:
-            return False
-
-    def inc_feature_value(self, key):
-        if self.is_feature_exists(key):
-            self.features[key] += 1
-        else:
-            self.features[key] = 1
-
-    def dec_feature_value(self, key):
-        if self.is_feature_exists(key):
-            self.features[key] -= 1
-        else:
-            self.features[key] = - 1
-
-    def set_feature_value(self, key, value):
-        self.features[key] = value
-
-    def get_feature_value(self, key):
-        if self.is_feature_exists(key):
-            return self.features[key]
-
-    def get_features(self, feature_set):
-        return self.features
+    def get_words(self):
+        return self.tokens
 
     def get_pos_tags(self):
-        return self.pos_tags
+        return [pos for (token, pos) in self.ps_tag]
 
-    def add_num_of_vag_nps(self):
-        pattern = "NP !<< PP|SBAR|ADVP " \
-				+ "!<< (CD|NNS < /^\\d\\d\\d\\ds?$/) " \
-				+ "!<< (NP < POS) " + "!< NNP|NNPS " \
-                + "[ !> NP | < POS ]"
+    def get_ne_chunks(self):
+        return [nec for (token, nec) in self.nchunk]
 
-        x = re.search(pattern,"NP !<< PP|SBAR|ADVP") # [('word','POS_TAG')] -> 'POS_TAG'
-        print(x)
-        if x: self.inc_feature_value('__num_of_vag_nps__')
-        self.score = (self.get_feature_value("__num_of_vag_nps__") * - 0.3 + self.get_feature_value('__length__') * 0.2) % 5
+    def get_stems(self):
+        return [porter.stem(token.lower()) for token in self.tokens]
 
-    def print_features(self):
-        print(self.features)
-        print('score = {0}'.format(self.score))
+    def get_cleaned_tokens(self, stopwords=()):
+        return [lemmatizer.lemmatize(token, 'n'
+                                     if tag.startswith('NN') else 'v'
+                                     if tag.startswith('VB') else 'a')
+                for (token, tag) in self.ps_tag]
+
+    def get_features(self):
+        if not self.features:
+            lemmas = [lemmatizer.lemmatize(token, 'n'
+                                           if tag.startswith('NN') else 'v'
+                                           if tag.startswith('VB') else 'a')
+                      for (token, tag) in self.ps_tag]
+            pos = [pos for (token, pos) in self.ps_tag]
+            ner = [ner for (token, ner) in self.nchunk]
+
+            self.features = dict(nltk.probability.FreqDist(lemmas + pos + ner))
+
+            self.features['LEN__'] = math.log10(len(self.string))
+
+            for i in range(5, 51, 5):
+                if i < len(self.string):
+                    self.features['LEN_' + str(i) + '_'] = 1.0
+                else:
+                    break
+
+            self.features['CNT__'] = math.log2(len(self.tokens))
+        return self.features
 
 
 class Sentence:
     def __init__(self, kwds={'source': "", 'question': "", 'answer': ""}):
-        self.question = kwds['question']
-        self.source = kwds['source']
-        self.answer = kwds['answer']
+        self.question = Featurable(kwds['question'])
+        self.source = Featurable(kwds['source'])
+        self.answer = Featurable(kwds['answer'])
+        self.morph_feat_dict = {}
 
-        self.question_feature = Featurable(self.question)
-        self.source_feature = Featurable(self.source)
-        self.answer_feature = Featurable(self.answer)
+    def get_all_words(self):
+        all_words = []
+        all_words.extend(self.question.get_lemmas())
+        all_words.extend(self.source.get_lemmas())
+        all_words.extend(self.answer.get_lemmas())
+        return all_words
 
-    def get_question(self):
-        return self.question
+    def extract_morphological_features(self):  # lemmas pos ner
+        if not self.morph_feat_dict:
+            feature_dicts = []
+            feature_dicts.append((self.question.get_features(), 'que.'))
+            feature_dicts.append((self.source.get_features(), 'src.'))
+            feature_dicts.append((self.answer.get_features(), 'ans.'))
 
-    def get_source(self):
-        return self.source
+            self.morph_feat_dict = {prefix+key: feat_dict[key] for (
+                feat_dict, prefix) in feature_dicts for key in feat_dict.keys()}
 
-    def get_answer(self):
-        return self.answer
+        return self.morph_feat_dict
 
-    def get_words(self):
-        return word_tokenize(self.question) + word_tokenize(self.source) + word_tokenize(self.answer)
+    def extract_vagueness_features(self):
+        return 0
 
-    def get_feature_vector(self, feature_dict):
-        return -1
 
 if __name__ == '__main__':
-    f = Featurable('Jhon\'s book was red')
-    f.add_num_of_vag_nps()
-    f.print_features()
+    stops = tuple([word for word in nltk.corpus.stopwords.words('english')
+                   if not word.startswith('wh') or word.startswith('how')])
+    test = {'question': "Who are interns in enocta?",
+            'source': "Adnan and Asrin are interns in Enocta Technologies in Asia",
+            'answer': "Adnan and Asrin"}
+
+    wf = Featurable(test['question'] + test['source'] + test['answer'])
+    s = Sentence(test)
+    print(s.extract_morphological_features())
