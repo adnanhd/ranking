@@ -51,15 +51,21 @@ class Featurable:
 
             self.features = dict(nltk.probability.FreqDist(lemmas + pos + ner))
 
-            self.features['LEN__'] = math.log10(len(self.string))
+            try:
+                self.features['LEN__'] = math.log10(len(self.string))
+            except ValueError:
+                self.features['LEN__'] = 0
 
-            for i in range(5, 51, 5):
+            for i in range(0, 51, 5):
                 if i < len(self.string):
                     self.features['LEN_' + str(i) + '_'] = 1.0
                 else:
                     break
 
-            self.features['CNT__'] = math.log2(len(self.tokens))
+            try:
+                self.features['CNT__'] = math.log2(len(self.tokens))
+            except ValueError:
+                self.features['CNT__'] = 0
         return self.features
 
 

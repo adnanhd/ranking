@@ -36,8 +36,9 @@ class RankingEvaluator:
 
 
 if __name__ == '__main__':
-    positive_samples = open('tests/positive_samples.txt')
-    negative_samples = open('tests/negative_samples.txt')
+    positive_samples = open('model/positive_samples.txt')
+    negative_samples = open('model/negative_samples.txt')
+    alperens_samples = open('tests/alperens_samples.txt')
 
     corpus = []
     corpus.extend([(eval(line), True)
@@ -45,10 +46,12 @@ if __name__ == '__main__':
     corpus.extend([(eval(line), False)
                    # line {'question':'str','answer':'str','source':'str'}
                    for line in negative_samples.readlines()])
+    test2_set = [(eval(line),True) for line in alperens_samples.readlines()]
+
 
     random.shuffle(corpus)
-    train_set = corpus[:int(len(corpus)*.7)]
-    tests_set = corpus[int(len(corpus)*.7):]
+    train_set = corpus[:int(len(corpus)*.8)]
+    tests_set = corpus[int(len(corpus)*.8):]
     
     positive_samples.close()
     negative_samples.close()
@@ -56,3 +59,4 @@ if __name__ == '__main__':
     re = RankingEvaluator()
     re.fit(train_set)
     re.test(tests_set)
+    re.test(test2_set)
