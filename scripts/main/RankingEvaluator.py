@@ -8,21 +8,15 @@ from FeatureExtractor import Sentence
 class RankingEvaluator:
     # [({'source':"", 'question':"", 'answer':""}, <LABEL>)]
     def __init__(self):
-        self.model = []
-        self.tests = []
-        self.words = []
-        self.freq_words = None
-        self.word_features = []
-        self.featuresets = []
+        self.classifier = nltk.classify.SklearnClassifier(
+            LinearSVC(max_iter=5000))
 
     def fit(self, corpus):
         # corpus: [({'question':'str','answer':'str','source':'str'}, 'label')]
+        dataset = [(Sentence(data).extract_morphological_features(), label)
+                   for (data, label) in corpus]
 
-        self.classifier = nltk.classify.SklearnClassifier(
-            LinearSVC(max_iter=5000))
-        self.dataset = [(Sentence(data).extract_morphological_features(), label)
-                        for (data, label) in corpus]
-        self.classifier.train(self.dataset)
+        self.classifier.train(dataset)
         print('model trained...')
 
     def predict(self, instance):
@@ -66,5 +60,17 @@ if __name__ == '__main__':
     re.test(tests_set)
 
     for line in test2_set:
-        if re.predict(line[0]) == line[1]:
-            print(line[0]['question'])
+        print("Source: {0}\nQuestion: {1}\nAnswer: {2}\nCategory: {3}\n\n\n".format(
+            line[0]['source'], line[0]['question'], line[0]['answer'], line[1]))
+
+    q = ' '
+    a = ' '
+    s = ' '
+    while q != '' and a != '' and s != '':
+        q = input('question> ')
+        a = input('answer> ')
+        s = input('source> ')
+        print('\n')
+
+        re.predict({'question': q, 'answer': a, 'source': s})
+        print('\n\n')

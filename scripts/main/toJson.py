@@ -1,4 +1,5 @@
-import sys,os
+import sys
+import os
 
 if __name__ == '__main__':
     files = os.listdir(sys.argv[1])
@@ -10,7 +11,7 @@ if __name__ == '__main__':
             lines.extend(file_.readlines())
             file_.close()
         except UnicodeDecodeError:
-            print (filename)
+            print(filename)
 
     pos_samples = []
     neg_samples = []
@@ -18,20 +19,25 @@ if __name__ == '__main__':
     for line in lines:
         try:
             splitted = [l for l in line.split('\t')]
-            if float(splitted[3]) > 2.8:
-                pos_samples.append(str({'question':splitted[0],'source':splitted[1],'answer':splitted[2]}) + '\n')
-            elif float(splitted[3]) < 1.00:
-                neg_samples.append(str({'question':splitted[0],'source':splitted[1],'answer':splitted[2]}) + '\n')
+            if float(splitted[3]) >= 3.00:
+                pos_samples.append(str(
+                    {'question': splitted[0], 'source': splitted[1], 'answer': splitted[2]}) + '\n')
+            elif float(splitted[3]) <= 1.00:
+                neg_samples.append(str(
+                    {'question': splitted[0], 'source': splitted[1], 'answer': splitted[2]}) + '\n')
         except UnicodeDecodeError:
-            print (line)
+            print(line)
 
-    
-    pos = open(sys.argv[2],'w')
-    neg = open(sys.argv[3],'w')
-    
-    
+    pos = open(sys.argv[2], 'w')
+    neg = open(sys.argv[3], 'w')
+
     pos.writelines(pos_samples)
     neg.writelines(neg_samples)
-    
+
     pos.close()
     neg.close()
+else:
+    lines = input('paste whole input here>\n').split('\n')
+
+    questions = [line for line in lines if line.startswith(' Question:')]
+    questions = [line for line in lines if line.startswith(' Answer:')]
