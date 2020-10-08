@@ -10,7 +10,7 @@
             "program": "${workspaceFolder}/main/toJson.py",
             "console": "integratedTerminal",
             "args": [
-                "${workspaceFolder}/../tests.old/article461.Mary_II_of_England.questions",
+                "${workspaceFolder}/que/",
                 "${workspaceFolder}/model/positive_samples.txt",
                 "${workspaceFolder}/model/negative_samples.txt"
             ]
